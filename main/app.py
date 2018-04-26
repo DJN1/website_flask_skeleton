@@ -19,7 +19,16 @@ port = 5000
 # Routes
 @app.route('/')
 def index():
-    return render_template('index.html')
+
+    name = 'David'
+
+    return render_template('index.html', **locals())
+
+    @app.route('/articles')
+    def articles():
+
+        # TODO: 
+        return render_template('expression')
 
 # Run the server
 app.run(port=port)
