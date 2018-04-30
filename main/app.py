@@ -17,18 +17,20 @@ app = Flask(__name__)
 port = 5000
 
 # Routes
+
+
 @app.route('/')
 def index():
-
     name = 'David'
-
     return render_template('index.html', **locals())
 
-    @app.route('/articles')
+
+@app.route('/articles')
     def articles():
 
-        # TODO: 
-        return render_template('expression')
+        # TODO: build articles.html
+        return render_template('articles.html')
+
 
 # Run the server
 app.run(port=port)
