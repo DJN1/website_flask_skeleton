@@ -11,6 +11,7 @@ from datetime import *
 from random import *
 import time
 from functools import wraps
+from forms import *
 
 # Init the application
 app = Flask(__name__)
@@ -26,10 +27,26 @@ def index():
 
 
 @app.route('/articles')
-    def articles():
-
+def articles():
         # TODO: build articles.html
-        return render_template('articles.html')
+    return render_template('articles.html')
+
+
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
+db = SQLAlchemy(app)
+app.secret_key = "random_large_int"
+Bootstrap(app)
+
+
+@app.route('/login', methods=['GET', 'POST'])  # Step 1 = Methods
+def login():
+    form = LoginForm()
+
+    if request.method == 'POST':  # Step 2 = If POST is the type of request
+        print('Success signing in {}'.format(form.email.data))
+        return redirect(url_for('index'))
+
+    return render_template('login.html', **locals())
 
 
 # Run the server
