@@ -19,25 +19,25 @@
 
     <div class="collapse navbar-collapse" id="navbarColor01">
       <ul class="navbar-nav mr-auto">
-        <li class="nav-item active">
-          <a class="nav-link" href="/index">Home<span class="sr-only">(current)</span></a>
+        <li class="nav-item {% if active == 'home'%} active {%endif%}">
+          <a class="nav-link" href="/index">Home{%if active == 'home'%}<span class="sr-only">(current)</span>{%endif%}</a>
         </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/articles">Articles</a>
+        <li class="nav-item {% if active == 'articles'%} active {%endif%}">
+          <a class="nav-link" href="/articles">Articles{%if active == 'articles'%}<span class="sr-only">(current)</span>{%endif%}</a>
         </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/team">Team</a>
+        <li class="nav-item {% if active == 'team'%} active {% endif %}">
+          <a class="nav-link" href="/team">Team {%if active == 'team'%}<span class="sr-only">(current)</span>{%endif%}</a>
         </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/about">About</a>
+        <li class="nav-item {% if active == 'about'%} active {% endif %}">
+          <a class="nav-link" href="/about">About {%if active == 'about'%}<span class="sr-only">(current)</span>{%endif%}</a>
         </li>
       </ul>
       <ul>
-        <li class="nav navbar-nav navbar-right">
-          <a class="nav-link" href="/login">Login</a>
+        <li class="nav navbar-nav navbar-right {% if active == 'login'%} active {% endif %}">
+          <a class="nav-link" href="/login">Login {%if active == 'login'%}<span class="sr-only">(current)</span>{%endif%}</a>
         </li>
-        <li class="nav navbar-nav navbar-right">
-          <a class="nav-link" href="/signup">Sign Up</a>
+        <li class="nav navbar-nav navbar-right {% if active == 'signup'%} active {% endif %}">
+          <a class="nav-link" href="/signup">Sign Up {%if active == 'signup'%}<span class="sr-only">(current)</span>{%endif%}</a>
         </li>
       </ul>
     </div>

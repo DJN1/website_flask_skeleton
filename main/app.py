@@ -22,6 +22,15 @@ db = SQLAlchemy(app)
 app.secret_key = "random_large_int"
 Bootstrap(app)
 
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'login'
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    return Users.query.get(int(user_id))
+
 
 class Users(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -33,41 +42,100 @@ class Users(UserMixin, db.Model):
     acclevel = db.Column(db.Integer)
 
 
+class RegistrationForm(Form):
+    first_name = StringField('First Name', [validators.Length(min=3, max=25)])
+    last_name = StringField('Last Name', [validators.Length(min=2, max=25)])
+    email = StringField('Email Address', [validators.Length(min=6, max=15)])
+    username = StringField('Username', [validators.Length(min=4, max=15)])
+    password = PasswordField('New Password', [
+        validators.DataRequired(),
+        validators.EqualTo('confirm', message='Passwords must match')
+    ])
+    confirm = PasswordField('Repeat Password')
+    acclevel = 0
+
+
 @app.route('/index')
 def index():
-    name = 'David'
+    active = 'home'
     return render_template('index.html', **locals())
 
 
 @app.route('/')
 def index1():
+    active = 'home'
     return render_template('index.html')
 
 
 @app.route('/articles')
 def articles():
-        # TODO: build articles.html
+    active = 'articles'
+    # TODO: build articles.html
     return render_template('articles.html')
 
 
 @app.route('/team')
 def team():
+    active = 'team'
     return render_template('team.html')
 
 
 @app.route('/about')
 def about():
+    active = 'about'
     return render_template('about.html')
 
 
 @app.route('/login', methods=['GET', 'POST'])  # Step 1 = Methods
 def login():
+    active = 'login'
     form = LoginForm()
 
-    if request.method == 'POST':  # Step 2 = If POST is the type of request
-        print('Success signing in {}'.format(form.email.data))
-        return redirect(url_for('index'))
+    if request.method == 'POST':
+        user = Users.query.filter_by(email=form.email.data).first()
+        if user:
+            if check_password_hash(user.password, form.password.data):
+                login_user(user)
+                print("Logged {} {} in".format(current_user.first_name,
+                                               current_user.last_name))
+                return redirect(url_for('dashboard'))
+            else:
+                print("Something is wrong with this login info...")
+                return redirect(url_for('login'))
+        else:
+            print("This isn't a user...")
+            render_template('login.html', **locals())
+
     return render_template('login.html', **locals())
+
+
+@app.route('/signup', methods=['GET', 'POST'])
+def signup():
+    form = RegistrationForm(request.form)
+    if request.method == 'POST' and form.validate():
+        user = User(form.username.data, form.email.data,
+                    form.password.data)
+        db_session.add(user)
+        flash('Thanks for registering')
+        return redirect(url_for('login'))
+    return render_template('signup.html', form=form)
+
+
+@app.route('/dashboard')
+@login_required
+def dashboard():
+    active = 'dashboard'
+    return render_template('dashboard.html', **locals())
+
+
+@app.route('/logout')
+@login_required
+def logout():
+    active = 'logout'
+    print('Logged out {}'.format(current_user.email))
+    session.pop('login', None)
+    logout_user()
+    return redirect(url_for('index'))
 
 
 # Run the server
