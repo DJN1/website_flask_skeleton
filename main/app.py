@@ -12,6 +12,7 @@ from random import *
 import time
 from functools import wraps
 from forms import *
+from data.py import Articles
 
 # Init the application
 app = Flask(__name__)
@@ -42,6 +43,9 @@ class Users(UserMixin, db.Model):
     acclevel = db.Column(db.Integer)
 
 
+Articles = Articles()
+
+
 @app.route('/index')
 def index():
     active = 'home'
@@ -58,7 +62,7 @@ def index1():
 def articles():
     active = 'articles'
     # TODO: build articles.html
-    return render_template('articles.html')
+    return render_template('articles.html', articles=Articles)
 
 
 @app.route('/team')
@@ -126,5 +130,5 @@ def logout():
 
 
 # Run the server
-app.run(port=port)
+app.run(debug=True, port=port)
 # test
