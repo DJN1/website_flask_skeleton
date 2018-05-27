@@ -42,19 +42,6 @@ class Users(UserMixin, db.Model):
     acclevel = db.Column(db.Integer)
 
 
-class RegistrationForm(Form):
-    first_name = StringField('First Name', [validators.Length(min=3, max=25)])
-    last_name = StringField('Last Name', [validators.Length(min=2, max=25)])
-    email = StringField('Email Address', [validators.Length(min=6, max=15)])
-    username = StringField('Username', [validators.Length(min=4, max=15)])
-    password = PasswordField('New Password', [
-        validators.DataRequired(),
-        validators.EqualTo('confirm', message='Passwords must match')
-    ])
-    confirm = PasswordField('Repeat Password')
-    acclevel = 0
-
-
 @app.route('/index')
 def index():
     active = 'home'
