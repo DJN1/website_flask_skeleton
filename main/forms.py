@@ -11,12 +11,13 @@ class LoginForm(FlaskForm):
 
 class RegistrationForm(Form):
     first_name = StringField('First Name', [validators.Length(min=3, max=25)])
-    last_name = StringField('Last Name', [validators.Length(min=2, max=25)])
-    email = StringField('Email Address', [validators.Length(min=6, max=15)])
-    username = StringField('Username', [validators.Length(min=4, max=15)])
+    last_name = StringField('Last Name', [validators.Length(min=2, max=40)])
+    email = StringField('Email Address', [validators.Length(min=6, max=100)])
+    username = StringField('Username', [validators.Length(min=4, max=30)])
     password = PasswordField('New Password', [
         validators.DataRequired(),
-        validators.EqualTo('confirm', message='Passwords must match')
+        validators.EqualTo('confirm', message='Passwords must match'),
+        validators.Length(min=6, max=100)
     ])
-    confirm = PasswordField('Repeat Password')
+    confirm = PasswordField('Confirm Password', [validators.DataRequired()])
     acclevel = 0

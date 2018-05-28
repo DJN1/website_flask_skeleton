@@ -1,4 +1,4 @@
-from flask import Flask, flash, redirect, render_template, request, session, abort, url_for, flash, jsonify, g
+from flask import Flask, flash, redirect, render_template, request, session, abort, url_for, flash, jsonify, g, logging
 from flask_sqlalchemy import SQLAlchemy
 from wtforms import *
 from flask_wtf import FlaskForm
@@ -12,16 +12,42 @@ from random import *
 import time
 from functools import wraps
 from forms import *
+import sqlite3
+from passlib.hash import sha256_crypt
 from data import Articles
 
 # Init the application
 app = Flask(__name__)
 port = 5000
 
+
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 db = SQLAlchemy(app)
 app.secret_key = "random_large_int"
 Bootstrap(app)
+
+DATABASE = '/main/database.db'
+
+
+def get_db():
+    db = getattr(g, '_database', None)
+    if db is None:
+        db = g._database = sqlite3.connect(DATABASE)
+    return db
+
+
+# @app.teardown_appcontext
+# def close_connection(exception):
+#     db = getattr(g, '_database', None)
+#     if db is not None:
+#         db.close()
+
+
+# def make_dicts(cursor, row):
+#     return dict((cursor.description[idx][0], value)
+#                 for idx, value in enumerate(row))
+#     db.row_factory = make_dicts
+
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -34,13 +60,13 @@ def load_user(user_id):
 
 
 class Users(UserMixin, db.Model):
-    id = db.Column(db.Integer, primary_key=True, sqlite_autoincrement=True)
+    id = db.Column(db.Integer, primary_key=True)
     first_name = db.Column(db.String(25))
     last_name = db.Column(db.String(40))
     email = db.Column(db.String(100))
     username = db.Column(db.String(30))
     password = db.Column(db.String(100))
-    register_date = db.Column(db.String, default=)
+    register_date = db.Column(db.String, default=str(datetime.datetime.utcnow))
     acclevel = db.Column(db.Integer)
 
 
@@ -106,16 +132,30 @@ def login():
     return render_template('login.html', **locals())
 
 
-@app.route('/signup', methods=['GET', 'POST'])
-def signup():
+@app.route('/register', methods=['GET', 'POST'])
+def register():
     form = RegistrationForm(request.form)
     if request.method == 'POST' and form.validate():
-        user = User(form.username.data, form.email.data,
-                    form.password.data)
-        db_session.add(user)
-        flash('Thanks for registering')
-        return redirect(url_for('login'))
-    return render_template('signup.html', form=form)
+        first_name = form.first_name.data
+        last_name = form.last_name.data
+        email = form.email.data
+        username = form.username.data
+        password = sha256_crypt.encrypt(str(form.password.data))
+
+        # Create Cursor
+        cur = get_db().cursor()
+        # Add user
+        cur.execute(
+            "INSERT INTO users(first_name, last_name, email, username, password) VALUES(%s, %s, %s, %s, %s)", (first_name, last_name, email, username, password))
+
+        # Commit to DB
+        db.commit()
+        flash('Registered successfully!', 'success')
+
+        # Close connection
+        cur.close()
+        redirect(url_for('login'))
+    return render_template('register.html', form=form)
 
 
 @app.route('/dashboard')
