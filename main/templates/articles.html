@@ -1,8 +1,9 @@
-{% extends "base.html" %} {% block title %} Articles {% endblock %}
-{% block content %}
-  <h1>Articles</h1>
-
+{% extends "base.html" %} {% block title %} Articles {% endblock %} {% block content %}
+<h1>Articles</h1>
+<ul class="list-group">
   {% for article in articles %}
-    {{article.title}}
+  <li class="list-group-item"><a href="article/{{article.id}}">{{article.title}}<a/></li>
   {% endfor %}
+</ul>
+
 {% endblock %}

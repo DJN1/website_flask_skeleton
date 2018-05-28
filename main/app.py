@@ -1,4 +1,4 @@
-from flask import Flask, flash, redirect, render_template, request, session, abort, url_for, flash, jsonify
+from flask import Flask, flash, redirect, render_template, request, session, abort, url_for, flash, jsonify, g
 from flask_sqlalchemy import SQLAlchemy
 from wtforms import *
 from flask_wtf import FlaskForm
@@ -12,7 +12,7 @@ from random import *
 import time
 from functools import wraps
 from forms import *
-from data.py import Articles
+from data import Articles
 
 # Init the application
 app = Flask(__name__)
@@ -34,12 +34,13 @@ def load_user(user_id):
 
 
 class Users(UserMixin, db.Model):
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, sqlite_autoincrement=True)
     first_name = db.Column(db.String(25))
-    last_name = db.Column(db.String(25))
-    email = db.Column(db.String(15))
-    username = db.Column(db.String(15))
-    password = db.Column(db.String(80))
+    last_name = db.Column(db.String(40))
+    email = db.Column(db.String(100))
+    username = db.Column(db.String(30))
+    password = db.Column(db.String(100))
+    register_date = db.Column(db.String, default=)
     acclevel = db.Column(db.Integer)
 
 
@@ -63,6 +64,11 @@ def articles():
     active = 'articles'
     # TODO: build articles.html
     return render_template('articles.html', articles=Articles)
+
+
+@app.route('/article/<string:id>/')
+def article(id):
+    return render_template('article.html', id=id)
 
 
 @app.route('/team')
@@ -130,5 +136,5 @@ def logout():
 
 
 # Run the server
-app.run(debug=True, port=port)
+app.run(port=port)
 # test
