@@ -28,7 +28,7 @@ db = SQLAlchemy(app)
 app.secret_key = "random_large_int"
 Bootstrap(app)
 
-DATABASE = '/main/database.db'
+DATABASE = 'database.db'
 
 
 def get_db():
@@ -113,25 +113,37 @@ def about():
 
 @app.route('/login', methods=['GET', 'POST'])  # Step 1 = Methods
 def login():
-    active = 'login'
     form = LoginForm()
-
     if request.method == 'POST':
-        user = Users.query.filter_by(email=form.email.data).first()
-        if user:
-            if check_password_hash(user.password, form.password.data):
-                login_user(user)
-                print("Logged {} {} in".format(current_user.first_name,
-                                               current_user.last_name))
+        # Get Form Fields
+        email = request.form['email']
+        password_candidate = request.form['password']
+        # Create cursor
+        cur = get_db().cursor()
+        # Get user by email
+        result = cur.execute("SELECT * FROM users WHERE email = ?", [email])
+        print(cur.fetchone())
+        if int(result) > 0:
+            # Get stored hash
+            data = cur.fetchone()
+            password = data['password']
+            # Compare Passwords
+            if sha256_crypt.verify(password_candidate, password):
+                # Passed
+                session['logged_in'] = True
+                session['email'] = email
+                flash('You are now logged in', 'success')
                 return redirect(url_for('dashboard'))
             else:
-                print("Something is wrong with this login info...")
-                return redirect(url_for('login'))
+                error = 'Invalid login'
+                return render_template('login.html', error=error)
+            # Close connection
+            cur.close()
         else:
-            print("This isn't a user...")
-            render_template('login.html', **locals())
+            error = 'Username not found'
+            return render_template('login.html', error=error)
 
-    return render_template('login.html', **locals())
+    return render_template('login.html', form=form)
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -148,10 +160,10 @@ def register():
         cur = get_db().cursor()
         # Add user
         cur.execute(
-            "INSERT INTO users(first_name, last_name, email, username, password) VALUES(%s, %s, %s, %s, %s)", (first_name, last_name, email, username, password))
+            "INSERT INTO users(first_name, last_name, email, username, password) VALUES(?, ?, ?, ?, ?)", (first_name, last_name, email, username, password))
 
         # Commit to DB
-        db.commit()
+        db.session.commit()
         flash('Registered successfully!', 'success')
 
         # Close connection
@@ -178,5 +190,5 @@ def logout():
 
 
 # Run the server
-# app.run(port=port)
+app.run(port=port)
 # test
