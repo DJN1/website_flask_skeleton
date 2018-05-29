@@ -1,5 +1,6 @@
 from flask import Flask, flash, redirect, render_template, request, session, abort, url_for, flash, jsonify, g, logging
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.sql import func
 from wtforms import *
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField
@@ -10,6 +11,7 @@ from flask_login import LoginManager, UserMixin, login_user, login_required, log
 from datetime import *
 from random import *
 import time
+import datetime
 from functools import wraps
 from forms import *
 import sqlite3
@@ -66,8 +68,8 @@ class Users(UserMixin, db.Model):
     email = db.Column(db.String(100))
     username = db.Column(db.String(30))
     password = db.Column(db.String(100))
-    register_date = db.Column(db.String, default=str(datetime.datetime.utcnow))
-    acclevel = db.Column(db.Integer)
+    register_date = db.Column(db.String, default=str(func.current_timestamp()))
+    acclevel = db.Column(db.Integer, default=0)
 
 
 Articles = Articles()
@@ -176,5 +178,5 @@ def logout():
 
 
 # Run the server
-app.run(port=port)
+# app.run(port=port)
 # test
