@@ -45,12 +45,6 @@ def get_db():
 #         db.close()
 
 
-# def make_dicts(cursor, row):
-#     return dict((cursor.description[idx][0], value)
-#                 for idx, value in enumerate(row))
-#     db.row_factory = make_dicts
-
-
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
@@ -96,7 +90,11 @@ def articles():
 
 @app.route('/article/<string:id>/')
 def article(id):
-    return render_template('article.html', id=id)
+    cur = get_db().cursor()
+    # Get article
+    result = cur.execute("SELECT * FROM articles WHERE id = ?", [id])
+    article = cur.fetchone()
+    return render_template('article.html', article=article)
 
 
 @app.route('/team')
@@ -121,12 +119,15 @@ def login():
         # Create cursor
         cur = get_db().cursor()
         # Get user by email
-        result = cur.execute("SELECT * FROM users WHERE email = ?", [email])
+        cur.execute("SELECT * FROM users WHERE email = ?", [email])
+        result = cur.fetchone()
         print(cur.fetchone())
-        if int(result) > 0:
+        if result is not None:
             # Get stored hash
+            cur.execute("SELECT * FROM users WHERE email = ?", [email])
             data = cur.fetchone()
-            password = data['password']
+            print(data)
+            password = data[5]
             # Compare Passwords
             if sha256_crypt.verify(password_candidate, password):
                 # Passed
@@ -159,16 +160,16 @@ def register():
         # Create Cursor
         cur = get_db().cursor()
         # Add user
+        print(cur.execute('''SELECT * FROM users''').fetchone())
         cur.execute(
-            "INSERT INTO users(first_name, last_name, email, username, password) VALUES(?, ?, ?, ?, ?)", (first_name, last_name, email, username, password))
+            'INSERT INTO users(first_name, last_name, email, username, password) VALUES(?, ?, ?, ?, ?)', (first_name, last_name, email, username, password))
 
         # Commit to DB
-        db.session.commit()
-        flash('Registered successfully!', 'success')
-
-        # Close connection
+        get_db().commit()
         cur.close()
-        redirect(url_for('login'))
+        flash('Registered successfully!', 'success')
+        return redirect(url_for('login'))
+
     return render_template('register.html', form=form)
 
 
