@@ -62,8 +62,8 @@ class Users(UserMixin, db.Model):
     email = db.Column(db.String(100))
     username = db.Column(db.String(30))
     password = db.Column(db.String(100))
-    register_date = db.Column(db.String, default=str(func.current_timestamp()))
-    acclevel = db.Column(db.Integer, default=0)
+    register_date = db.Column(db.String)
+    acclevel = db.Column(db.Integer)
 
 
 Articles = Articles()
@@ -116,6 +116,7 @@ def login():
         # Get Form Fields
         email = request.form['email']
         password_candidate = request.form['password']
+        user = Users.query.filter_by(email=request.form['email']).first()
         # Create cursor
         cur = get_db().cursor()
         # Get user by email
@@ -131,8 +132,7 @@ def login():
             # Compare Passwords
             if sha256_crypt.verify(password_candidate, password):
                 # Passed
-                session['logged_in'] = True
-                session['email'] = email
+                login_user(user)
                 flash('You are now logged in', 'success')
                 return redirect(url_for('dashboard'))
             else:

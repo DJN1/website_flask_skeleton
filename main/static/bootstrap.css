@@ -9439,8 +9439,8 @@ a.text-dark:hover, a.text-dark:focus {
 }
 
 .navbar-nav .nav-link {
-  padding-top: .715rem;
-  padding-bottom: .715rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
 }
 
 .navbar-brand {
@@ -9452,7 +9452,7 @@ a.text-dark:hover, a.text-dark:focus {
 }
 
 .bg-light {
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  border: 0px solid rgba(0, 0, 0, 0.1);
 }
 
 .bg-light.navbar-fixed-top {
