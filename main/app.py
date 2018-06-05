@@ -14,7 +14,7 @@ import time
 import datetime
 from functools import wraps
 from forms import *
-import sqlite3
+# import sqlite3
 from passlib.hash import sha256_crypt
 from data import Articles
 
@@ -31,11 +31,11 @@ Bootstrap(app)
 DATABASE = 'database.db'
 
 
-def get_db():
-    db = getattr(g, '_database', None)
-    if db is None:
-        db = g._database = sqlite3.connect(DATABASE)
-    return db
+# def get_db():
+#     db = getattr(g, '_database', None)
+#     if db is None:
+#         db = g._database = sqlite3.connect(DATABASE)
+#     return db
 
 
 # @app.teardown_appcontext
@@ -90,10 +90,8 @@ def articles():
 
 @app.route('/article/<string:id>/')
 def article(id):
-    cur = get_db().cursor()
     # Get article
-    result = cur.execute("SELECT * FROM articles WHERE id = ?", [id])
-    article = cur.fetchone()
+    article = Articles.query.filter_by(id=id)
     return render_template('article.html', article=article)
 
 
@@ -116,31 +114,25 @@ def login():
         # Get Form Fields
         email = request.form['email']
         password_candidate = request.form['password']
-        user = Users.query.filter_by(email=request.form['email']).first()
-        # Create cursor
-        cur = get_db().cursor()
+        user = Users.query.filter_by(email=email).first()
         # Get user by email
-        cur.execute("SELECT * FROM users WHERE email = ?", [email])
-        result = cur.fetchone()
-        print(cur.fetchone())
-        if result is not None:
-            # Get stored hash
-            cur.execute("SELECT * FROM users WHERE email = ?", [email])
-            data = cur.fetchone()
-            print(data)
-            password = data[5]
+        print(user.email)
+        if user is not None:
+            # Get user password
+            password = user.password
             # Compare Passwords
             if sha256_crypt.verify(password_candidate, password):
-                # Passed
-                login_user(user)
+                # If password matches, authenticate
+                login_user(user, remember=False)
                 flash('You are now logged in', 'success')
+                print(current_user.username)
                 return redirect(url_for('dashboard'))
             else:
+                # If invalid password, return invalid login
                 error = 'Invalid login'
                 return render_template('login.html', error=error)
-            # Close connection
-            cur.close()
         else:
+            # If user not existent, return error
             error = 'Username not found'
             return render_template('login.html', error=error)
 
@@ -151,22 +143,17 @@ def login():
 def register():
     form = RegistrationForm(request.form)
     if request.method == 'POST' and form.validate():
-        first_name = form.first_name.data
-        last_name = form.last_name.data
-        email = form.email.data
-        username = form.username.data
-        password = sha256_crypt.encrypt(str(form.password.data))
-
-        # Create Cursor
-        cur = get_db().cursor()
+        firstname = form.first_name.data
+        lastname = form.last_name.data
+        eMail = form.email.data
+        userName = form.username.data
+        passWord = sha256_crypt.encrypt(str(form.password.data))
         # Add user
-        print(cur.execute('''SELECT * FROM users''').fetchone())
-        cur.execute(
-            'INSERT INTO users(first_name, last_name, email, username, password) VALUES(?, ?, ?, ?, ?)', (first_name, last_name, email, username, password))
-
+        user = Users(first_name=firstname, last_name=lastname,
+                     email=eMail, username=userName, password=passWord)
+        db.session.add(user)
         # Commit to DB
-        get_db().commit()
-        cur.close()
+        db.session.commit()
         flash('Registered successfully!', 'success')
         return redirect(url_for('login'))
 
@@ -179,12 +166,33 @@ def dashboard():
     active = 'dashboard'
     return render_template('dashboard.html', **locals())
 
+# Add Article
+
+
+@app.route('/add_article', methods=['GET', 'POST'])
+@login_required
+def add_article():
+    form = ArticleForm(request.form)
+    if request.method == 'POST' and form.validate():
+        title = form.title.data
+        body = form.body.data
+
+        # Execute query
+        article = Articles(title, body, current_user.username)
+        db.session.add(article)
+        # Commit to DB
+        db.session.commit()
+        flash('Article added successfully', 'success')
+        return redirect(url_for('dashboard'))
+
+    return render_template('dashboard.html', **locals())
+
 
 @app.route('/logout')
 @login_required
 def logout():
     active = 'logout'
-    print('Logged out {}'.format(current_user.email))
+    print('Logged out ?', current_user.email)
     session.pop('login', None)
     logout_user()
     return redirect(url_for('index'))

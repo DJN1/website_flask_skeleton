@@ -1,8 +1,8 @@
 {% extends 'base.html' %}
 {% block title %} Dashboard {% endblock %}
 {% block content %}
-  <h1>Dashboard <small> Welcome {{session.username}}</small></h1>
-  <a class="btn btn-success" href="/add_article"> Add Article</a>
+  <h1>Dashboard <small> Welcome {{current_user.username}}</small></h1>
+  <a class="btn btn-success" href="/add_article">Add Article</a>
   <hr>
   <table class="table table-striped">
     <tr>

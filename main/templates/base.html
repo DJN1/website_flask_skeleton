@@ -33,7 +33,19 @@
           <a class="nav-link" href="/about">About</a>
         </li>
       </ul>
-      <ul>
+    </div>
+    <div class="navbar-collapse collapse w-100 order-3 dual-collapse2">
+      {% if current_user.is_authenticated %}
+      <ul class="navbar-nav ml-auto">
+        <li class="nav navbar-nav navbar-right">
+          <a class="nav-link" href="/dashboard">Dashboard</a>
+        </li>
+        <li class="nav navbar-nav navbar-right">
+          <a class="nav-link" href="/logout">Logout</a>
+        </li>
+      </ul>
+      {% else %}
+      <ul class="navbar-nav ml-auto">
         <li class="nav navbar-nav navbar-right">
           <a class="nav-link" href="/login">Login</a>
         </li>
@@ -41,6 +53,7 @@
           <a class="nav-link" href="/register">Register</a>
         </li>
       </ul>
+      {% endif %}
     </div>
   </nav>
   <br>

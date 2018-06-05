@@ -21,3 +21,8 @@ class RegistrationForm(Form):
     ])
     confirm = PasswordField('Confirm Password', [validators.DataRequired()])
     acclevel = 0
+
+
+class ArticleForm(Form):
+    title = StringField('Title', [validators.Length(min=1, max=200)])
+    body = TextAreaField('Body', [validators.Length(min=30)])
