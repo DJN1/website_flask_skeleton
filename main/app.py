@@ -174,18 +174,18 @@ def dashboard():
 def add_article():
     form = ArticleForm(request.form)
     if request.method == 'POST' and form.validate():
-        title = form.title.data
-        body = form.body.data
+        artTitle = form.title.data
+        artBody = form.body.data
 
         # Execute query
-        article = Articles(title, body, current_user.username)
-        db.session.add(article)
+        newArticle = Articles(title=artTitle, body=artBody, author=current_user.username)
+        db.session.add(newArticle)
         # Commit to DB
         db.session.commit()
         flash('Article added successfully', 'success')
         return redirect(url_for('dashboard'))
 
-    return render_template('dashboard.html', **locals())
+    return render_template('add_article.html', **locals())
 
 
 @app.route('/logout')
