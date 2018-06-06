@@ -16,7 +16,7 @@ from functools import wraps
 from forms import *
 # import sqlite3
 from passlib.hash import sha256_crypt
-from data import Articles
+#from data import Articles
 
 # Init the application
 app = Flask(__name__)
@@ -66,7 +66,14 @@ class Users(UserMixin, db.Model):
     acclevel = db.Column(db.Integer)
 
 
-Articles = Articles()
+class Articles(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(255))
+    author = db.Column(db.String(100))
+    body = db.Column(db.String)
+    create_date = db.Column(db.String)
+
+#Articles = Articles()
 
 
 @app.route('/index')
