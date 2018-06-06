@@ -176,16 +176,17 @@ def add_article():
     if request.method == 'POST' and form.validate():
         artTitle = form.title.data
         artBody = form.body.data
+        uname = current_user.username
 
         # Execute query
-        newArticle = Articles(title=artTitle, body=artBody, author=current_user.username)
+        newArticle = Articles(title=artTitle, author=uname, body=artBody)
         db.session.add(newArticle)
         # Commit to DB
         db.session.commit()
         flash('Article added successfully', 'success')
         return redirect(url_for('dashboard'))
 
-    return render_template('add_article.html', **locals())
+    return render_template('add_article.html', form=form)
 
 
 @app.route('/logout')
