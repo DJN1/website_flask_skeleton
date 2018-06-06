@@ -62,8 +62,6 @@ class Users(UserMixin, db.Model):
     email = db.Column(db.String(100))
     username = db.Column(db.String(30))
     password = db.Column(db.String(100))
-    register_date = db.Column(db.String)
-    acclevel = db.Column(db.Integer)
 
 
 class Articles(db.Model):
@@ -71,7 +69,6 @@ class Articles(db.Model):
     title = db.Column(db.String(255))
     author = db.Column(db.String(100))
     body = db.Column(db.String)
-    create_date = db.Column(db.String)
 
 #Articles = Articles()
 
