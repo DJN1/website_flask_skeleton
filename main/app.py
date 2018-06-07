@@ -88,7 +88,15 @@ def index1():
 @app.route('/articles')
 def articles():
     active = 'articles'
-    # TODO: build articles.html
+    listOfArticles = Articles.query.all()
+
+    if len(listOfArticles) > 0:
+        return render_template('articles.html', articles=listOfArticles)
+    else:
+        msg = 'No Articles Found'
+        return render_template('articles.html', msg=msg)
+    # Close connection
+    cur.close()
     return render_template('articles.html', articles=Articles)
 
 
@@ -168,7 +176,8 @@ def register():
 @login_required
 def dashboard():
     active = 'dashboard'
-    return render_template('dashboard.html', **locals())
+    listOfArticles = Articles.query.all()
+    return render_template('dashboard.html', articles=listOfArticles)
 
 # Add Article
 
