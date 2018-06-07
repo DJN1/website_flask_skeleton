@@ -69,6 +69,7 @@ class Articles(db.Model):
     title = db.Column(db.String(255))
     author = db.Column(db.String(100))
     body = db.Column(db.String)
+    create_date = db.Column(db.String, server_default=FetchedValue())
 
 #Articles = Articles()
 
@@ -192,7 +193,8 @@ def add_article():
         uname = current_user.username
 
         # Execute query
-        newArticle = Articles(title=artTitle, author=uname, body=artBody)
+        newArticle = Articles(title=artTitle, author=uname,
+                              body=artBody)
         db.session.add(newArticle)
         # Commit to DB
         db.session.commit()
