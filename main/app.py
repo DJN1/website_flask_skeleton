@@ -104,8 +104,11 @@ def articles():
 @app.route('/article/<string:id>/')
 def article(id):
     # Get article
-    article = Articles.query.filter_by(id=id)
-    return render_template('article.html', article=article)
+    article = Articles.query.filter_by(id=id).first()
+    print(article.create_date)
+    date = article.create_date[:10]
+    time = article.create_date[10:]
+    return render_template('article.html', article=article, date=date, time=time)
 
 
 @app.route('/team')

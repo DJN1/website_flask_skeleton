@@ -1,8 +1,10 @@
-{% extends "base.html" %}
-{% block title %} Article {% endblock %}
+{% extends 'base.html' %}
 
 {% block content %}
-
-<h1>{{id}}</h1>
-
+  <h1>{{article.title}}</h1>
+  <small>Written by {{article.author}} on {{date}} at {{time}}</small>
+  <hr>
+  <div>
+    {{article.body | safe}}
+  </div>
 {% endblock %}
