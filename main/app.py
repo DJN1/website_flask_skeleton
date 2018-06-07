@@ -69,7 +69,7 @@ class Articles(db.Model):
     title = db.Column(db.String(255))
     author = db.Column(db.String(100))
     body = db.Column(db.String)
-    create_date = db.Column(db.String, server_default=FetchedValue())
+    create_date = db.Column(db.String, server_default=db.FetchedValue())
 
 #Articles = Articles()
 
