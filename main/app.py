@@ -123,6 +123,11 @@ def about():
     return render_template('about.html')
 
 
+@app.route('/polls')
+def polls():
+    return render_template('polls.html')
+
+
 @app.route('/login', methods=['GET', 'POST'])  # Step 1 = Methods
 def login():
     form = LoginForm()
@@ -233,6 +238,22 @@ def edit_article(id):
     return render_template('edit_article.html', form=form)
 
 
+@app.route('/delete_article/<string:id>', methods=['POST'])
+@login_required
+def delete_article(id):
+    # Query article by id
+    article = Articles.query.filter_by(id=id).first()
+    print(article)
+    # Delete querried article
+    db.session.delete(article)
+    # Commit to db
+    db.session.commit()
+
+    flash('Article Deleted', 'success')
+
+    return redirect(url_for('dashboard'))
+
+
 @app.route('/logout')
 @login_required
 def logout():
@@ -244,5 +265,5 @@ def logout():
 
 
 # Run the server
-app.run(port=port)
+app.run(port=port, debug=True)
 # test
