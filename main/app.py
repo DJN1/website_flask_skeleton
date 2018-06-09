@@ -207,6 +207,32 @@ def add_article():
     return render_template('add_article.html', form=form)
 
 
+@app.route('/edit_article/<string:id>', methods=['GET', 'POST'])
+@login_required
+def edit_article(id):
+    # Get article by id
+    article = Articles.query.filter_by(id=id).first()
+    # Get form
+    form = ArticleForm(request.form)
+
+    # Populate article form fields
+    form.title.data = article.title
+    form.body.data = article.body
+
+    if request.method == 'POST' and form.validate():
+        title = ArticleForm(request.form).title.data
+        body = ArticleForm(request.form).body.data
+        article.title = title
+        article.body = body
+        db.session.commit()
+
+        flash('Article Updated', 'success')
+
+        return redirect(url_for('dashboard'))
+
+    return render_template('edit_article.html', form=form)
+
+
 @app.route('/logout')
 @login_required
 def logout():
