@@ -62,6 +62,7 @@ class Users(UserMixin, db.Model):
     email = db.Column(db.String(100))
     username = db.Column(db.String(30))
     password = db.Column(db.String(100))
+    acclevel = db.Column(db.Integer, server_default=db.FetchedValue())
 
 
 class Articles(db.Model):
@@ -185,8 +186,12 @@ def register():
 @login_required
 def dashboard():
     active = 'dashboard'
-    listOfArticles = Articles.query.all()
-    return render_template('dashboard.html', articles=listOfArticles)
+    if current_user.acclevel == 1:
+        adminlistOfArticles = Articles.query.all()
+        return render_template('dashboard.html', articles=adminlistOfArticles)
+    else:
+        listOfArticles = Articles.query.filter_by(author=current_user.username).all()
+        return render_template('dashboard.html', articles=listOfArticles)
 
 # Add Article
 
@@ -265,5 +270,5 @@ def logout():
 
 
 # Run the server
-app.run(port=port, debug=True)
+app.run(port=port)
 # test
