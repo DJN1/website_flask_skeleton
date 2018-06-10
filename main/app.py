@@ -13,6 +13,7 @@ from random import *
 import time
 import datetime
 from functools import wraps
+import pygal
 from forms import *
 # import sqlite3
 from passlib.hash import sha256_crypt
@@ -126,7 +127,9 @@ def about():
 
 @app.route('/polls')
 def polls():
-    return render_template('polls.html')
+    bar_chart = pygal.Bar()
+    bar_chart.add('First Chart', [1, 4, 6, 3, 8, 5, 3, 4, 6, 7, 4])
+    return render_template('polls.html', bar_chart=bar_chart)
 
 
 @app.route('/login', methods=['GET', 'POST'])  # Step 1 = Methods
