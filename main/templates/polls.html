@@ -1,5 +1,8 @@
 {% extends 'base.html'%}
 {% block content %}
+
 <h1>Here are the polls</h1>
-  {{ bar_chart.render() | safe }}
+<div>
+  <embed type="image/svg+xml" src= {{ pie_chart|safe }} />
+</div>
 {% endblock %}

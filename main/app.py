@@ -14,6 +14,7 @@ import time
 import datetime
 from functools import wraps
 import pygal
+from pygal.style import *
 from forms import *
 # import sqlite3
 from passlib.hash import sha256_crypt
@@ -98,8 +99,6 @@ def articles():
     else:
         msg = 'No Articles Found'
         return render_template('articles.html', msg=msg)
-    # Close connection
-    cur.close()
     return render_template('articles.html', articles=Articles)
 
 
@@ -127,9 +126,12 @@ def about():
 
 @app.route('/polls')
 def polls():
-    bar_chart = pygal.Bar()
-    bar_chart.add('First Chart', [1, 4, 6, 3, 8, 5, 3, 4, 6, 7, 4])
-    return render_template('polls.html', bar_chart=bar_chart)
+    pie_chart = pygal.Pie(style=NeonStyle)
+    pie_chart.add('First Chart', 1)
+    pie_chart.add('First Chart', 3)
+    pie_chart.add('First Chart', 0.4)
+    pie_chart = pie_chart.render_data_uri()
+    return render_template('polls.html', pie_chart=pie_chart)
 
 
 @app.route('/login', methods=['GET', 'POST'])  # Step 1 = Methods
