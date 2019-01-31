@@ -2,3 +2,4 @@
 venv/
 .vscode/
 *.pyc
+main/__pycache__/
