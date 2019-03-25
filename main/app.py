@@ -1,21 +1,14 @@
-from flask import Flask, flash, redirect, render_template, request, session, abort, url_for, flash, jsonify, g, logging
+from flask import Flask, flash, redirect, render_template, request, session, \
+    url_for
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.sql import func
 from wtforms import *
-from flask_wtf import FlaskForm
-from flask_wtf.file import FileField
-from wtforms.validators import InputRequired, Email, Length
 from flask_bootstrap import Bootstrap
-from werkzeug.security import generate_password_hash, check_password_hash
-from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
+from flask_login import LoginManager, UserMixin, login_user, login_required, \
+    logout_user, current_user
 from datetime import *
 from random import *
-import time
-import datetime
-from functools import wraps
-import pygal
-from pygal.style import *
-from forms import *
+from pygal import *
+from forms import LoginForm, RegistrationForm, ArticleForm
 # import sqlite3
 from passlib.hash import sha256_crypt
 #from data import Articles
@@ -143,8 +136,7 @@ def login():
         password_candidate = request.form['password']
         user = Users.query.filter_by(email=email).first()
         # Get user by email
-        print(user.email)
-        if user is not None:
+        if user is not None and email is not None:
             # Get user password
             password = user.password
             # Compare Passwords
@@ -157,10 +149,12 @@ def login():
             else:
                 # If invalid password, return invalid login
                 error = 'Invalid login'
-                return render_template('login.html', error=error)
+                flash(error, 'danger')
+                return redirect(url_for('login'))
         else:
             # If user not existent, return error
-            error = 'Username not found'
+            error = 'Email can\'t be blank'
+            flash(error, 'danger')
             return render_template('login.html', error=error)
 
     return render_template('login.html', form=form)
