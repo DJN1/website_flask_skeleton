@@ -131,7 +131,7 @@ def login():
         user = Users.query.filter_by(email=email).first()
         print(user)
         # Get user by email
-        if user is not None:
+        if user is not None and email is not None:
             # Get user password
             password = user.password
             # Compare Passwords
@@ -143,13 +143,13 @@ def login():
                 return redirect(url_for('dashboard'))
             else:
                 # If invalid password, return invalid login
-                error = 'Invalid Password'
-                flash(error, "danger")
-                return render_template('login.html', error=error)
+                error = 'Invalid login'
+                flash(error, 'danger')
+                return redirect(url_for('login'))
         else:
             # If user not existent, return error
-            error = 'User not found. Doublecheck your email address.'
-            flash(error, "danger")
+            error = 'Email can\'t be blank'
+            flash(error, 'danger')
             return render_template('login.html', error=error)
 
     return render_template('login.html', form=form)
