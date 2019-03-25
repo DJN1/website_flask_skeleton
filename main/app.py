@@ -1,24 +1,15 @@
-from flask import Flask, flash, redirect, render_template, request, session, abort, url_for, flash, jsonify, g, logging
+from flask import Flask, flash, redirect, render_template, request, session,\
+      url_for
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.sql import func
-from wtforms import *
-from flask_wtf import FlaskForm
-from flask_wtf.file import FileField
-from wtforms.validators import InputRequired, Email, Length
 from flask_bootstrap import Bootstrap
-from werkzeug.security import generate_password_hash, check_password_hash
-from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
-from datetime import *
-from random import *
-import time
-import datetime
-from functools import wraps
+from flask_login import LoginManager, UserMixin, login_user, login_required, \
+    logout_user, current_user
 import pygal
-from pygal.style import *
-from forms import *
+from pygal.style import NeonStyle
+from forms import LoginForm, RegistrationForm, ArticleForm
 # import sqlite3
 from passlib.hash import sha256_crypt
-#from data import Articles
+# from data import Articles
 
 # Init the application
 app = Flask(__name__)
@@ -74,24 +65,21 @@ class Articles(db.Model):
     body = db.Column(db.String)
     create_date = db.Column(db.String, server_default=db.FetchedValue())
 
-#Articles = Articles()
+# Articles = Articles()
 
 
 @app.route('/index')
 def index():
-    active = 'home'
     return render_template('index.html', **locals())
 
 
 @app.route('/')
 def index1():
-    active = 'home'
     return render_template('index.html')
 
 
 @app.route('/articles')
 def articles():
-    active = 'articles'
     listOfArticles = Articles.query.all()
 
     if len(listOfArticles) > 0:
@@ -109,18 +97,17 @@ def article(id):
     print(article.create_date)
     date = article.create_date[:10]
     time = article.create_date[10:]
-    return render_template('article.html', article=article, date=date, time=time)
+    return \
+        render_template('article.html', article=article, date=date, time=time)
 
 
 @app.route('/team')
 def team():
-    active = 'team'
     return render_template('team.html')
 
 
 @app.route('/about')
 def about():
-    active = 'about'
     return render_template('about.html')
 
 
@@ -142,8 +129,8 @@ def login():
         email = request.form['email']
         password_candidate = request.form['password']
         user = Users.query.filter_by(email=email).first()
+        print(user)
         # Get user by email
-        print(user.email)
         if user is not None:
             # Get user password
             password = user.password
@@ -156,11 +143,13 @@ def login():
                 return redirect(url_for('dashboard'))
             else:
                 # If invalid password, return invalid login
-                error = 'Invalid login'
+                error = 'Invalid Password'
+                flash(error, "danger")
                 return render_template('login.html', error=error)
         else:
             # If user not existent, return error
-            error = 'Username not found'
+            error = 'User not found. Doublecheck your email address.'
+            flash(error, "danger")
             return render_template('login.html', error=error)
 
     return render_template('login.html', form=form)
@@ -190,12 +179,12 @@ def register():
 @app.route('/dashboard')
 @login_required
 def dashboard():
-    active = 'dashboard'
     if current_user.acclevel == 1:
         adminlistOfArticles = Articles.query.all()
         return render_template('dashboard.html', articles=adminlistOfArticles)
     else:
-        listOfArticles = Articles.query.filter_by(author=current_user.username).all()
+        listOfArticles = \
+            Articles.query.filter_by(author=current_user.username).all()
         return render_template('dashboard.html', articles=listOfArticles)
 
 # Add Article
@@ -267,7 +256,6 @@ def delete_article(id):
 @app.route('/logout')
 @login_required
 def logout():
-    active = 'logout'
     print('Logged out ?', current_user.email)
     session.pop('login', None)
     logout_user()
