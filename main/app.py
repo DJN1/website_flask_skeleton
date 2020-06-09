@@ -222,7 +222,7 @@ def edit_article(id):
     # Populate article form fields
     form.title.data = article.title
     form.body.data = article.body
-
+    # if method is post, and the form validates, create new article
     if request.method == 'POST' and form.validate():
         title = ArticleForm(request.form).title.data
         body = ArticleForm(request.form).body.data
